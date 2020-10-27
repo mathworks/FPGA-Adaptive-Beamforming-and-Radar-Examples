@@ -1,0 +1,12 @@
+**/slprj/
+*.mexw64
+**/*_ert_rtw
+**/hdl_prj
+*.asv
+*.bak
+*.exp
+*.lib
+*.slxc
+*.zip
+*.pdf
+RFTool_Log.txt
