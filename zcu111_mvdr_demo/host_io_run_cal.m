@@ -5,7 +5,7 @@ if ~exist('REG_MAP','var')
     host_io_init;
 end
 
-fprintf('Running channel calbration...\n');
+fprintf('Running channel calibration...\n');
 
 % Register init
 regWr_TxNCOInc([2666 3333]);

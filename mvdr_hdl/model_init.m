@@ -84,11 +84,7 @@ matrixDivDelay = NumberOfCORDICIterations*10 + 86;
 
 normResponseDelay = 50;
 
-if measureDelays
-    mvdrPipelineDelay = 0;
-else
-    mvdrPipelineDelay = covMatDelay+movAvgDelay+matrixDivDelay+normResponseDelay;
-end
+mvdrPipelineDelay = covMatDelay+movAvgDelay+matrixDivDelay+normResponseDelay;
 
 %% Simulation parameters
 stoptime = frameTime*6;
