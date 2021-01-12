@@ -2,7 +2,7 @@
 % Edit this script as necessary to conform to your design specification or settings
 
 %% Instantiate object and basic settings
-rfobj = ZynqRF.comm.rfcontrol;
+rfobj = ZynqRF.comm.rfsocdev('zu28dr');
 rfobj.RemoteIPAddr = '192.168.1.101';
 rfobj.MTSConfigure = true;
 
