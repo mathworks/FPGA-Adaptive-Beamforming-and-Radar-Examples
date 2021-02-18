@@ -1,4 +1,7 @@
-% program_board Utility script to program the board after bitstream generation
+%   program_board Utility script to program the board after bitstream generation
+%
+%   Copyright 2021 The MathWorks, Inc.
+
 
 bitstream = fullfile('binaries','zcu111_mvdr.bit');
 devicetree = 'devicetree_adi_axistream_32.dtb';

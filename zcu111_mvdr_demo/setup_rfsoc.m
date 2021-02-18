@@ -1,5 +1,8 @@
 % This script was auto-generated from the HDL Coder Workflow Advisor for the ZCU111
 % Edit this script as necessary to conform to your design specification or settings
+%
+%   Copyright 2021 The MathWorks, Inc.
+
 
 %% Instantiate object and basic settings
 rfobj = soc.RFDataConverter('zu28dr','192.168.1.101');
@@ -89,7 +92,12 @@ configureDACChannel(rfobj, 2, 4, InterpolationFactor); % Channel 4
 %% ADC IQ mode settings 
 
 ADC_DDC_LO = -DDC_DUC_LO; 
+AdcTileArr = {rfobj.Tile1_ADC,...
+              rfobj.Tile2_ADC,...
+              rfobj.Tile3_ADC,...
+              rfobj.Tile4_ADC};
           
+ADC_IQ_To_Real_Format = 'Real->IQ'; 
 
 if rfobj.MTSConfigure
     EventMode = 'Sysref';
@@ -119,7 +127,10 @@ end
 %% DAC IQ mode settings 
 
 DAC_DUC_FREQ = DDC_DUC_LO;
+DacTileArr = {rfobj.Tile1_DAC,...
+              rfobj.Tile2_DAC};
           
+DAC_IQ_To_Real_Format = 'IQ->Real';          
 DAC_MixingScale = '1';
 DAC_MixerPhase = 0.0;
 

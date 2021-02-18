@@ -1,4 +1,7 @@
 %% Environment
+%
+%   Copyright 2021 The MathWorks, Inc.
+
 propSpeed = physconst('LightSpeed');   % Propagation speed
 fc = 915e6;           % Operating frequency
 lambda = propSpeed/fc;

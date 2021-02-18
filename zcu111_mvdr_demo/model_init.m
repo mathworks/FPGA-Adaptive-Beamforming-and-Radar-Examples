@@ -1,4 +1,8 @@
 % ADC/DAC sampling rate
+%
+%   Copyright 2021 The MathWorks, Inc.
+
+
 ConverterSampleRate = 1966.08e6; 
 
 % DDC/DUC factor

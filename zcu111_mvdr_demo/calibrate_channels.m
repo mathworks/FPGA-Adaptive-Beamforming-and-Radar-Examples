@@ -1,6 +1,8 @@
 function coeffs = calibrate_channels(data)
-% This function computes complex coefficients to align amplitude and phase
-% across all channels (narrowband only)
+%   This function computes complex coefficients to align amplitude and phase
+%   across all channels (narrowband only)
+%
+%   Copyright 2021 The MathWorks, Inc.
 
 % ensure columns as channels
 if (size(data,2) > size(data,1))
