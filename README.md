@@ -27,3 +27,5 @@ debugging and visualization.
 - MATLAB MVDR reference code
 - HDL Coder implementation
 - Hardware Prototyping – live demo
+
+The license used in this contribution is the XSLA license, which is the most common license for MathWorks staff contributions.
