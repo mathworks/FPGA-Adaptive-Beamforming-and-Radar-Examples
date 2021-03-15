@@ -1,5 +1,16 @@
 # FPGA Adaptive Beamforming with HDL Coder and Zynq RFSoC
 
+## Overview
+
+This seminar will demonstrate how to design and implement the minimum-variance
+distortionless-response (MVDR) adaptive beamforming algorithm on the Xilinx®
+Zynq UltraScale+™ RFSoC platform. By following a Model-Based Design strategy, 
+we show how the MVDR beamformer can be articulated in MATLAB, Simulink, 
+Fixed-Point and HDL. We further demonstrate a prototyping workflow by deploying
+the beamformer to the ZCU111 RFSoC evaluation board for run-time testing, 
+debugging and visualization.
+
+
 ## Agenda
 
 
