@@ -10,3 +10,5 @@
 *.zip
 *.pdf
 RFTool_Log.txt
+RF_Init.cfg
+init.sh

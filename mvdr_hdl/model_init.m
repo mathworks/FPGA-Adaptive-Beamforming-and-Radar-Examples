@@ -87,4 +87,4 @@ normResponseDelay = 50;
 mvdrPipelineDelay = covMatDelay+movAvgDelay+matrixDivDelay+normResponseDelay;
 
 %% Simulation parameters
-stoptime = frameTime*6;
+stoptime = frameTime*8;

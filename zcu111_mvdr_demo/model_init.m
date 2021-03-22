@@ -23,37 +23,56 @@ SampleDataWidth = 16*2; % 16-bit I/Q samples
 % Channel data width
 ChannelDataWidth = SampleDataWidth*VectorSamplingFactor;
 
-% DMA info
-S2MM_frame_size = 1e3;
-
 % Tx NCO parameters
 NCO_bits = 14;
-NCO_gain_bits = 16;
-NCO_default_freq = 10*1e6;
-NCO_default_phase = 0;
-NCO_default_increment = floor(NCO_default_freq*2^NCO_bits/DataSampleRate);
-NCO_default_offset = floor(NCO_default_phase*2^NCO_bits/(2*pi));
-NCO_default_gain = 1; % values between 0 and 1
+NCO_default_freq = 10e6;
+NCO_default_inc = floor(NCO_default_freq*2^NCO_bits/DataSampleRate);
+
+%% Create test source data
+
+rng('default');
+
+testSrc1 = struct();
+testSrc1.NFrames=15;
+testSrc1.FrameLength=256;
+testSrc1.PreambleLength=24;
+testSrc1.SamplesPerSymbol=4;
+
+[testSrc1.Data,testSrc1.mfCoeffs,testSrc1.rrcCoeffs] = ...
+    generate_qpsk_signal(testSrc1.NFrames,testSrc1.FrameLength,...
+        testSrc1.PreambleLength,testSrc1.SamplesPerSymbol);
+
+testSrc2 = struct();
+testSrc2.NFrames=7;
+testSrc2.FrameLength=128;
+testSrc2.PreambleLength=24;
+testSrc2.SamplesPerSymbol=16;
+testSrc2.Data = ...
+    generate_qpsk_signal(testSrc2.NFrames,testSrc2.FrameLength,...
+        testSrc2.PreambleLength,testSrc2.SamplesPerSymbol);
+
+%% DMA
+S2MM_frame_size = testSrc1.FrameLength*testSrc1.SamplesPerSymbol*3;
 
 %% Environment
 propSpeed = physconst('LightSpeed');   % Propagation speed
 fc = ConverterSampleRate/4;           % Operating frequency
 lambda = propSpeed/fc;
 
-%% Receiver
+%% Beamformer parameters
+
+% Number of array elements
 numArrayElements = 4;
+
+% Uniform linar array
 sensorArray = phased.ULA('NumElements',numArrayElements,'ElementSpacing',0.5*lambda);
+
+% Steering vector computation for array
 steeringVector = phased.SteeringVector('SensorArray',sensorArray);
-windowSize = 1024; % pick this to have a power of 2 square root
-frameTime = windowSize*Ts;
 
-%% Tracked Signals
-
-srcAngles = [20 60];
-
-% start freq, end freq, sweep time
-srcSignalParam1 = [5e6 10e6 5e-6]; 
-srcSignalParam2 = [20e6 25e6 5e-6];
+% Moving average window size
+% pick this to have a power of 2 square root
+windowSize = 1024;
 
 %% Fixed point datatypes
 
@@ -93,6 +112,9 @@ coeff_dt = fixdt(1,18,16);
 % Output
 output_dt = fixdt(1,32,30);
 
+% Tx output gain
+tx_gain_dt = fixdt(1,16,14);
+
 %% CORDIC matrix divide parameters
 
 % N<WordLength
@@ -116,4 +138,5 @@ normResponseDelay = 50;
 mvdrPipelineDelay = covMatDelay+movAvgDelay+matrixDivDelay+normResponseDelay;
 
 %% Simulation parameters
-stoptime = frameTime*10;
+frameTime = windowSize*Ts;
+stoptime = frameTime*40;

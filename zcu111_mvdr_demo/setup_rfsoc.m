@@ -2,8 +2,7 @@
 % Edit this script as necessary to conform to your design specification or settings
 
 %% Instantiate object and basic settings
-rfobj = ZynqRF.comm.rfsocdev('zu28dr');
-rfobj.RemoteIPAddr = '192.168.1.101';
+rfobj = soc.RFDataConverter('zu28dr','192.168.1.101');
 rfobj.MTSConfigure = true;
 
 PLLSrc = 'External LMK/LMX';
@@ -16,6 +15,7 @@ DDC_DUC_LO = ADCSamplingRate/4; % MHz - Define LO Frequency (MHz) here
 FineMixMode = true; 
 
 %% User FPGA-logic settings
+% Do not change
 rfobj.FPGASamplesPerClock = 1;
 rfobj.ConverterClockRatio = 2;
 
@@ -31,70 +31,65 @@ setup(rfobj)
 
 %% Set required clocks for MTS
 rfobj.LMKClkSelect = 'SYSREF';
-rfobj.SetLMXExtPLL(ReferenceClock);
+rfobj.configureLMXPLL(ReferenceClock);
 
 
 
 %% Setup ADC Tile sampling and PLL rates
 
 % Tile 1 ADC
-rfobj.Tile1_ADC.PLLSrc = PLLSrc;
-rfobj.Tile1_ADC.PLLReferenceClk = ReferenceClock;
-rfobj.Tile1_ADC.PLLSampleRate = ADCSamplingRate;
-rfobj.Tile1_ADC.Ch0.DecimationMode = DecimationFactor;
-rfobj.Tile1_ADC.Ch1.DecimationMode = DecimationFactor;
+% syntax: configureADCTile(obj, tileId, PLLSrc, PLLRefClk, samplingRate)
+configureADCTile(rfobj,1,PLLSrc,ReferenceClock,ADCSamplingRate);
+% syntax: configureADCChannel(obj, tileId, channelID, decimationFactor)
+configureADCChannel(rfobj, 1, 1, DecimationFactor); % Channel 1
+configureADCChannel(rfobj, 1, 2, DecimationFactor); % Channel 2
 
 % Tile 2 ADC
-rfobj.Tile2_ADC.PLLSrc = PLLSrc;
-rfobj.Tile2_ADC.PLLReferenceClk = ReferenceClock;
-rfobj.Tile2_ADC.PLLSampleRate = ADCSamplingRate;
-rfobj.Tile2_ADC.Ch0.DecimationMode = DecimationFactor;
-rfobj.Tile2_ADC.Ch1.DecimationMode = DecimationFactor;
+% syntax: configureADCTile(obj, tileId, PLLSrc, PLLRefClk, samplingRate)
+configureADCTile(rfobj,2,PLLSrc,ReferenceClock,ADCSamplingRate);
+% syntax: configureADCChannel(obj, tileId, channelID, decimationFactor)
+configureADCChannel(rfobj, 2, 1, DecimationFactor); % Channel 1
+configureADCChannel(rfobj, 2, 2, DecimationFactor); % Channel 2
 
 % Tile 3 ADC
-rfobj.Tile3_ADC.PLLSrc = PLLSrc;
-rfobj.Tile3_ADC.PLLReferenceClk = ReferenceClock;
-rfobj.Tile3_ADC.PLLSampleRate = ADCSamplingRate;
-rfobj.Tile3_ADC.Ch0.DecimationMode = DecimationFactor;
-rfobj.Tile3_ADC.Ch1.DecimationMode = DecimationFactor;
+% syntax: configureADCTile(obj, tileId, PLLSrc, PLLRefClk, samplingRate)
+configureADCTile(rfobj,3,PLLSrc,ReferenceClock,ADCSamplingRate);
+% syntax: configureADCChannel(obj, tileId, channelID, decimationFactor)
+configureADCChannel(rfobj, 3, 1, DecimationFactor); % Channel 1
+configureADCChannel(rfobj, 3, 2, DecimationFactor); % Channel 2
 
 % Tile 4 ADC
-rfobj.Tile4_ADC.PLLSrc = PLLSrc;
-rfobj.Tile4_ADC.PLLReferenceClk = ReferenceClock;
-rfobj.Tile4_ADC.PLLSampleRate = ADCSamplingRate;
-rfobj.Tile4_ADC.Ch0.DecimationMode = DecimationFactor;
-rfobj.Tile4_ADC.Ch1.DecimationMode = DecimationFactor;
+% syntax: configureADCTile(obj, tileId, PLLSrc, PLLRefClk, samplingRate)
+configureADCTile(rfobj,4,PLLSrc,ReferenceClock,ADCSamplingRate);
+% syntax: configureADCChannel(obj, tileId, channelID, decimationFactor)
+configureADCChannel(rfobj, 4, 1, DecimationFactor); % Channel 1
+configureADCChannel(rfobj, 4, 2, DecimationFactor); % Channel 2
 
 %% Setup DAC Tiles sampling and PLL rates
 
 % Tile 1 DAC
-rfobj.Tile1_DAC.PLLSrc = PLLSrc;
-rfobj.Tile1_DAC.PLLReferenceClk = ReferenceClock;
-rfobj.Tile1_DAC.PLLSampleRate = DACSamplingRate;
-rfobj.Tile1_DAC.Ch0.InterpolationMode = InterpolationFactor;
-rfobj.Tile1_DAC.Ch1.InterpolationMode = InterpolationFactor;
-rfobj.Tile1_DAC.Ch2.InterpolationMode = InterpolationFactor;
-rfobj.Tile1_DAC.Ch3.InterpolationMode = InterpolationFactor;
+% syntax: configureDACTile(obj, tileId, PLLSrc, PLLRefClk, samplingRate)
+configureDACTile(rfobj,1,PLLSrc,ReferenceClock,DACSamplingRate);
+% syntax: configureDACChannel(obj, tileId, channelID, interpolationFactor)
+configureDACChannel(rfobj, 1, 1, InterpolationFactor); % Channel 1
+configureDACChannel(rfobj, 1, 2, InterpolationFactor); % Channel 2
+configureDACChannel(rfobj, 1, 3, InterpolationFactor); % Channel 3
+configureDACChannel(rfobj, 1, 4, InterpolationFactor); % Channel 4
 
-% Tile 1 DAC
-rfobj.Tile2_DAC.PLLSrc = PLLSrc;
-rfobj.Tile2_DAC.PLLReferenceClk = ReferenceClock;
-rfobj.Tile2_DAC.PLLSampleRate = DACSamplingRate;
-rfobj.Tile2_DAC.Ch0.InterpolationMode = InterpolationFactor;
-rfobj.Tile2_DAC.Ch1.InterpolationMode = InterpolationFactor;
-rfobj.Tile2_DAC.Ch2.InterpolationMode = InterpolationFactor;
-rfobj.Tile2_DAC.Ch3.InterpolationMode = InterpolationFactor;
+% Tile 2 DAC
+% syntax: configureDACTile(obj, tileId, PLLSrc, PLLRefClk, samplingRate)
+configureDACTile(rfobj,2,PLLSrc,ReferenceClock,DACSamplingRate);
+% syntax: configureDACChannel(obj, tileId, channelID, interpolationFactor)
+configureDACChannel(rfobj, 2, 1, InterpolationFactor); % Channel 1
+configureDACChannel(rfobj, 2, 2, InterpolationFactor); % Channel 2
+configureDACChannel(rfobj, 2, 3, InterpolationFactor); % Channel 3
+configureDACChannel(rfobj, 2, 4, InterpolationFactor); % Channel 4
 
 
 %% ADC IQ mode settings 
 
 ADC_DDC_LO = -DDC_DUC_LO; 
-AdcTileArr = {rfobj.Tile1_ADC,...
-              rfobj.Tile2_ADC,...
-              rfobj.Tile3_ADC,...
-              rfobj.Tile4_ADC};
           
-ADC_IQ_To_Real_Format = 'Real->IQ'; 
 
 if rfobj.MTSConfigure
     EventMode = 'Sysref';
@@ -104,38 +99,19 @@ end
 
 ADC_MixingScale = '1';
 ADC_MixerPhase = 0.0;
-for TileIdx = 1:rfobj.ADCNumTiles
-    
-    AdcTileArr{TileIdx}.Ch0.MixerSettings.DataFormatType = 'IQ';
-    AdcTileArr{TileIdx}.Ch1.MixerSettings.DataFormatType = 'IQ';
+for TileIdx = 1:rfobj.TotalADCTiles
     
     if FineMixMode %Fine Mixing Mode
         
-        AdcTileArr{TileIdx}.Ch0.MixerSettings.MixerType = 'Fine';
-        AdcTileArr{TileIdx}.Ch0.MixerSettings.MixerMode = ADC_IQ_To_Real_Format;
-        AdcTileArr{TileIdx}.Ch0.MixerSettings.NCOFrequency = ADC_DDC_LO;
-        AdcTileArr{TileIdx}.Ch0.MixerSettings.NCOPhase = ADC_MixerPhase;
-        AdcTileArr{TileIdx}.Ch0.MixerSettings.EventSource = EventMode;
-        AdcTileArr{TileIdx}.Ch0.MixerSettings.FineMixerScale = ADC_MixingScale;
-        
-        AdcTileArr{TileIdx}.Ch1.MixerSettings.MixerType = 'Fine';
-        AdcTileArr{TileIdx}.Ch1.MixerSettings.MixerMode = ADC_IQ_To_Real_Format;
-        AdcTileArr{TileIdx}.Ch1.MixerSettings.NCOFrequency = ADC_DDC_LO;
-        AdcTileArr{TileIdx}.Ch1.MixerSettings.NCOPhase = ADC_MixerPhase;
-        AdcTileArr{TileIdx}.Ch1.MixerSettings.EventSource = EventMode;
-        AdcTileArr{TileIdx}.Ch1.MixerSettings.FineMixerScale = ADC_MixingScale;
+        % syntax: configureADCMixer(obj, tileId, channelID, mixerType, mixerFrequency, eventSource, NCOPhase, fineMixerScale)
+        configureADCMixer(rfobj, TileIdx, 1, 'Fine', ADC_DDC_LO, EventMode, ADC_MixerPhase, ADC_MixingScale); % Channel 1
+        configureADCMixer(rfobj, TileIdx, 2, 'Fine', ADC_DDC_LO, EventMode, ADC_MixerPhase, ADC_MixingScale); % Channel 2
         
     else %Coarse Mixing Mode
         
-        AdcTileArr{TileIdx}.Ch0.MixerSettings.MixerType = 'Coarse';
-        AdcTileArr{TileIdx}.Ch0.MixerSettings.MixerMode = ADC_IQ_To_Real_Format;
-        AdcTileArr{TileIdx}.Ch0.MixerSettings.CoarseFreq = '-Fs/4';     
-        AdcTileArr{TileIdx}.Ch0.MixerSettings.EventSource = EventMode;
-        
-        AdcTileArr{TileIdx}.Ch1.MixerSettings.MixerType = 'Coarse';
-        AdcTileArr{TileIdx}.Ch1.MixerSettings.MixerMode = ADC_IQ_To_Real_Format;
-        AdcTileArr{TileIdx}.Ch1.MixerSettings.CoarseFreq = '-Fs/4';
-        AdcTileArr{TileIdx}.Ch1.MixerSettings.EventSource = EventMode;
+        % syntax: configureADCMixer(obj, tileId, channelID, mixerType, mixerFrequency, eventSource)
+        configureADCMixer(rfobj, TileIdx, 1, 'Coarse', '-Fs/4', EventMode); % Channel 1
+        configureADCMixer(rfobj, TileIdx, 2, 'Coarse', '-Fs/4', EventMode); % Channel 2
         
     end
 end
@@ -143,10 +119,7 @@ end
 %% DAC IQ mode settings 
 
 DAC_DUC_FREQ = DDC_DUC_LO;
-DacTileArr = {rfobj.Tile1_DAC,...
-              rfobj.Tile2_DAC};
           
-DAC_IQ_To_Real_Format = 'IQ->Real';          
 DAC_MixingScale = '1';
 DAC_MixerPhase = 0.0;
 
@@ -156,65 +129,22 @@ else
     EventMode = 'Immediate';
 end
 
-for TileIdx = 1:rfobj.DACNumTiles
-    DacTileArr{TileIdx}.Ch0.MixerSettings.DataFormatType = 'IQ';
-    DacTileArr{TileIdx}.Ch1.MixerSettings.DataFormatType = 'IQ';
-    DacTileArr{TileIdx}.Ch2.MixerSettings.DataFormatType = 'IQ';
-    DacTileArr{TileIdx}.Ch3.MixerSettings.DataFormatType = 'IQ';
+for TileIdx = 1:rfobj.TotalDACTiles
     
     if FineMixMode %Fine Mixing Mode
-        DacTileArr{TileIdx}.Ch0.MixerSettings.MixerType = 'Fine';
-        DacTileArr{TileIdx}.Ch0.MixerSettings.MixerMode = DAC_IQ_To_Real_Format;
-        DacTileArr{TileIdx}.Ch0.MixerSettings.NCOFrequency = DAC_DUC_FREQ;
-        DacTileArr{TileIdx}.Ch0.MixerSettings.NCOPhase = DAC_MixerPhase;
-        DacTileArr{TileIdx}.Ch0.MixerSettings.FineMixerScale = DAC_MixingScale; 
-        DacTileArr{TileIdx}.Ch0.MixerSettings.EventSource = EventMode;
-       
-
-        DacTileArr{TileIdx}.Ch1.MixerSettings.MixerType = 'Fine';
-        DacTileArr{TileIdx}.Ch1.MixerSettings.MixerMode = DAC_IQ_To_Real_Format;
-        DacTileArr{TileIdx}.Ch1.MixerSettings.NCOFrequency = DAC_DUC_FREQ;
-        DacTileArr{TileIdx}.Ch1.MixerSettings.NCOPhase = DAC_MixerPhase;
-        DacTileArr{TileIdx}.Ch1.MixerSettings.FineMixerScale = DAC_MixingScale; 
-        DacTileArr{TileIdx}.Ch1.MixerSettings.EventSource = EventMode;
-       
-
-        DacTileArr{TileIdx}.Ch2.MixerSettings.MixerType = 'Fine';
-        DacTileArr{TileIdx}.Ch2.MixerSettings.MixerMode = DAC_IQ_To_Real_Format;
-        DacTileArr{TileIdx}.Ch2.MixerSettings.NCOFrequency = DAC_DUC_FREQ;
-        DacTileArr{TileIdx}.Ch2.MixerSettings.NCOPhase = DAC_MixerPhase;
-        DacTileArr{TileIdx}.Ch2.MixerSettings.FineMixerScale = DAC_MixingScale;
-        DacTileArr{TileIdx}.Ch2.MixerSettings.EventSource = EventMode;
-     
-
-        DacTileArr{TileIdx}.Ch3.MixerSettings.MixerType = 'Fine';
-        DacTileArr{TileIdx}.Ch3.MixerSettings.MixerMode = DAC_IQ_To_Real_Format;
-        DacTileArr{TileIdx}.Ch3.MixerSettings.NCOFrequency = DAC_DUC_FREQ;
-        DacTileArr{TileIdx}.Ch3.MixerSettings.NCOPhase = DAC_MixerPhase;
-        DacTileArr{TileIdx}.Ch3.MixerSettings.FineMixerScale = DAC_MixingScale;
-        DacTileArr{TileIdx}.Ch3.MixerSettings.EventSource = EventMode;
+        % syntax: configureDACMixer(obj, tileId, channelId, mixerType, mixerFrequency, eventSource, NCOPhase, fineMixerScale)
+        configureDACMixer(rfobj, TileIdx, 1, 'Fine', DAC_DUC_FREQ, EventMode, DAC_MixerPhase, DAC_MixingScale); % Channel 1
+        configureDACMixer(rfobj, TileIdx, 2, 'Fine', DAC_DUC_FREQ, EventMode, DAC_MixerPhase, DAC_MixingScale); % Channel 2
+        configureDACMixer(rfobj, TileIdx, 3, 'Fine', DAC_DUC_FREQ, EventMode, DAC_MixerPhase, DAC_MixingScale); % Channel 3
+        configureDACMixer(rfobj, TileIdx, 4, 'Fine', DAC_DUC_FREQ, EventMode, DAC_MixerPhase, DAC_MixingScale); % Channel 4
       
 
     else %Coarse Mixing Mode
-        DacTileArr{TileIdx}.Ch0.MixerSettings.MixerType = 'Coarse';
-        DacTileArr{TileIdx}.Ch0.MixerSettings.MixerMode = DAC_IQ_To_Real_Format;
-        DacTileArr{TileIdx}.Ch0.MixerSettings.CoarseFreq = 'Fs/4';       
-        DacTileArr{TileIdx}.Ch0.MixerSettings.EventSource = EventMode;       
-        
-        DacTileArr{TileIdx}.Ch1.MixerSettings.MixerType = 'Coarse';
-        DacTileArr{TileIdx}.Ch1.MixerSettings.MixerMode = DAC_IQ_To_Real_Format;
-        DacTileArr{TileIdx}.Ch1.MixerSettings.CoarseFreq = 'Fs/4';
-        DacTileArr{TileIdx}.Ch1.MixerSettings.EventSource = EventMode;   
-        
-        DacTileArr{TileIdx}.Ch2.MixerSettings.MixerType = 'Coarse';
-        DacTileArr{TileIdx}.Ch2.MixerSettings.MixerMode = DAC_IQ_To_Real_Format;
-        DacTileArr{TileIdx}.Ch2.MixerSettings.CoarseFreq = 'Fs/4';       
-        DacTileArr{TileIdx}.Ch2.MixerSettings.EventSource = EventMode;   
-        
-        DacTileArr{TileIdx}.Ch3.MixerSettings.MixerType = 'Coarse';
-        DacTileArr{TileIdx}.Ch3.MixerSettings.MixerMode = DAC_IQ_To_Real_Format;
-        DacTileArr{TileIdx}.Ch3.MixerSettings.CoarseFreq = 'Fs/4';
-        DacTileArr{TileIdx}.Ch3.MixerSettings.EventSource = EventMode;   
+        % syntax: configureDACMixer(obj, tileId, channelId, mixerType, mixerFrequency, eventSource)
+        configureDACMixer(rfobj, TileIdx, 1, 'Coarse', 'Fs/4', EventMode); % Channel 1
+        configureDACMixer(rfobj, TileIdx, 2, 'Coarse', 'Fs/4', EventMode); % Channel 2
+        configureDACMixer(rfobj, TileIdx, 3, 'Coarse', 'Fs/4', EventMode); % Channel 3
+        configureDACMixer(rfobj, TileIdx, 4, 'Coarse', 'Fs/4', EventMode); % Channel 4
     end
 
 end
@@ -222,12 +152,12 @@ end
 
 
 %% Apply settings to RFTool
-step(rfobj)
+applyConfiguration(rfobj)
 
 
 
 %% Perform MTS capture
-rfobj.SetupMTS()
+rfobj.enableMTS()
 
 %% Disconnect and clear system object
 release(rfobj)
