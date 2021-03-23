@@ -1,6 +1,11 @@
 classdef RFSoCMVDRDemo < handle
     %RFSOCMVDRDEMO RFSoC MVDR Demo
     
+    properties
+       enableSpectrum = false;
+       enableConstellation = false;
+    end
+    
     properties (SetAccess = private)
         % Run status
         isRunning
@@ -92,14 +97,21 @@ classdef RFSoCMVDRDemo < handle
             end
         end
         
-        function resp = getArrayResponse(obj)
+        function [resp, weights] = getArrayResponse(obj,mode)
+            switch mode
+                case 'mvdr'
+                    weightsVec = readPort(obj.hFPGA, "computedWeights");
+                    weights = reshape(double(complex(weightsVec(1:4),weightsVec(5:8))),4,1);
+                case 'phaseshift'
+                    weights = obj.steeringVector(obj.centerFrequency,[obj.SteeringAngle; 0]);
+            end
             resp=pattern(obj.sensorArray,obj.centerFrequency,-90:90,0,...
-                'Weights',obj.SteeringCoeff);
+                'Weights',weights);
         end
     end
     
     %% UI set methods
-    methods        
+    methods
         function setSignalAngle(obj,val)
             obj.SignalAngle = val;
             obj.SignalCoeff = obj.steeringVector(obj.centerFrequency,[obj.SignalAngle; 0]);
@@ -150,10 +162,11 @@ classdef RFSoCMVDRDemo < handle
             initializeRegisters(obj);
             
             % Set default UI parameters            
-            obj.setSignalGain(0);
-            obj.setSignalAngle(40);
+            obj.setSignalGain(-6);
+            obj.setSignalAngle(-45);
             obj.setInterfererGain(0);
-            obj.setInterfererAngle(-10);
+            obj.setInterfererAngle(17);
+            obj.setSteeringAngle(-45);
             
             % Run calibration routine to align channels
             runCalibration(obj);
@@ -309,14 +322,22 @@ classdef RFSoCMVDRDemo < handle
         end
         
         function updateViewers(obj)
-            if ~obj.hSpecAn.isVisible
-               show(obj.hSpecAn);
+            if obj.enableSpectrum
+                if ~obj.hSpecAn.isVisible
+                   show(obj.hSpecAn);
+                end
+                obj.hSpecAn(obj.beamData);
+            else
+                hide(obj.hSpecAn);
             end
-            if ~obj.hConstellation.isVisible
-               show(obj.hConstellation);
+            if obj.enableConstellation
+                if ~obj.hConstellation.isVisible
+                   show(obj.hConstellation);
+                end
+                obj.hConstellation(obj.qpskData);
+            else
+                hide(obj.hConstellation);
             end
-            obj.hSpecAn(obj.beamData);
-            obj.hConstellation(obj.qpskData);
         end
         
         function setupFPGAIO(obj)
@@ -446,8 +467,15 @@ classdef RFSoCMVDRDemo < handle
                 "Dimension", [1 1], ...
                 "IOInterface", "AXI4", ...
                 "IOInterfaceMapping", "0x11C");
+            
+            hPort_computedWeights = hdlcoder.DUTPort("computedWeights", ...
+                "Direction", "OUT", ...
+                "DataType", numerictype(1,24,16), ...
+                "Dimension", [1 8], ...
+                "IOInterface", "AXI4", ...
+                "IOInterfaceMapping", "0x260");
 
-            mapPort(obj.hFPGA, [hPort_tx_steering_coeffs_src1_re, hPort_tx_steering_coeffs_src1_im, hPort_tx_steering_coeffs_src2_re, hPort_tx_steering_coeffs_src2_im, hPort_rx_steering_coeffs_re, hPort_rx_steering_coeffs_im, hPort_rx_cal_coeffs_re, hPort_rx_cal_coeffs_im, hPort_tx_src_gains, hPort_rx_frame_size, hPort_rx_auto_trig_period, hPort_rx_auto_trig_en, hPort_rx_capture_trig, hPort_tx_nco_enable, hPort_tx_nco_inc, hPort_BypassMVDR, hPort_BypassAnalog]);
+            mapPort(obj.hFPGA, [hPort_tx_steering_coeffs_src1_re, hPort_tx_steering_coeffs_src1_im, hPort_tx_steering_coeffs_src2_re, hPort_tx_steering_coeffs_src2_im, hPort_rx_steering_coeffs_re, hPort_rx_steering_coeffs_im, hPort_rx_cal_coeffs_re, hPort_rx_cal_coeffs_im, hPort_tx_src_gains, hPort_rx_frame_size, hPort_rx_auto_trig_period, hPort_rx_auto_trig_en, hPort_rx_capture_trig, hPort_tx_nco_enable, hPort_tx_nco_inc, hPort_BypassMVDR, hPort_BypassAnalog, hPort_computedWeights]);
 
             % AXI4-Stream DMA
             addAXI4StreamInterface(obj.hFPGA, ...

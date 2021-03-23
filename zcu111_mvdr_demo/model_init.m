@@ -72,7 +72,7 @@ steeringVector = phased.SteeringVector('SensorArray',sensorArray);
 
 % Moving average window size
 % pick this to have a power of 2 square root
-windowSize = 1024;
+windowSize = 4096;
 
 %% Fixed point datatypes
 
