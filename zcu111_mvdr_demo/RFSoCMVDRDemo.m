@@ -84,8 +84,8 @@ classdef RFSoCMVDRDemo < handle
         function run(obj)
             if ~obj.isRunning
                 obj.isRunning = true;
-                setupListeners(obj);
-                start(obj.updateTimer);
+               setupListeners(obj);
+               % start(obj.updateTimer); -- disable this timer for now
             end
         end
         
@@ -143,6 +143,14 @@ classdef RFSoCMVDRDemo < handle
             obj.SteeringCoeff = obj.steeringVector(obj.centerFrequency,[obj.SteeringAngle; 0]);
             writePort(obj.hFPGA, "rx_steering_coeffs_re", real(obj.SteeringCoeff));
             writePort(obj.hFPGA, "rx_steering_coeffs_im", imag(obj.SteeringCoeff));
+        end
+        
+        function  [beamData,qpskData, sampleRate] = getUIData(obj)
+            captureData(obj);
+            qpskReceive(obj);
+            beamData = obj.beamData;
+            qpskData = obj.qpskData;
+            sampleRate = obj.DataSampleRate;
         end
     end
     
@@ -230,6 +238,8 @@ classdef RFSoCMVDRDemo < handle
             qpskReceive(obj) 
             updateViewers(obj);
         end
+        
+    
         
         function stopCallback(obj)
             stop(obj); 
@@ -482,7 +492,7 @@ classdef RFSoCMVDRDemo < handle
                 "InterfaceID", "AXI4-Stream DMA", ...
                 "WriteEnable", false, ...
                 "ReadEnable", true, ...
-                "ReadTimeout", 0.5, ...
+                "ReadTimeout", 0, ...
                 "ReadFrameLength", obj.DMAReadFrameSize);
 
             hPort_S2MM_Data = hdlcoder.DUTPort("S2MM_Data", ...
