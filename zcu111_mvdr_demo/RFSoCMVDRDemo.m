@@ -1,6 +1,7 @@
 classdef RFSoCMVDRDemo < handle
-    %RFSOCMVDRDEMO RFSoC MVDR Demo
-    
+ %RFSOCMVDRDEMO RFSoC MVDR Demo
+ %   Copyright 2021 The MathWorks, Inc.
+ 
     properties
        enableSpectrum = false;
        enableConstellation = false;

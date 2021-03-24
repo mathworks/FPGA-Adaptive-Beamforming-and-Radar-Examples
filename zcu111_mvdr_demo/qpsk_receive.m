@@ -1,6 +1,9 @@
 function dataOut = qpsk_receive(dataIn, ...
     FrameLength, SamplesPerSymbol, PreambleLength, ...
     mfCoeffs, rrcCoeffs)
+% QPSK symbol alignment and decoding 
+%
+%   Copyright 2021 The MathWorks, Inc.
 
 % Upsampled Frame/Preamble lengths
 FrameLengthUp = FrameLength*SamplesPerSymbol;

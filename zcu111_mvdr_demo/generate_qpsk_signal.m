@@ -1,5 +1,8 @@
 function [txData,matchedFilterCoeffs,rrcFilterCoeffs] = generate_qpsk_signal( ...
     NFrames,FrameLength,PreambleLength,SamplesPerSymbol)
+% QPSK signal generation
+%
+%   Copyright 2021 The MathWorks, Inc.
 
 % Use QPSK modulation
 M=4;

@@ -1,4 +1,7 @@
 function plot_beam_patterns(hAxes,mvdrResponse,phaseShiftResponse,signalAngle,interfererAngle)
+% Helper function for beam-pattern plotting
+%
+%   Copyright 2021 The MathWorks, Inc.
 
 hold(hAxes,'off');
 plot(hAxes,-90:90,mvdrResponse,'Color','#0072BD','LineStyle','-','LineWidth',2);
