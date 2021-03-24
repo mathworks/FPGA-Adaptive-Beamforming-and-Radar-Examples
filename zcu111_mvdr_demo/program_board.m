@@ -3,15 +3,17 @@
 %   Copyright 2021 The MathWorks, Inc.
 
 
-bitstream = fullfile('binaries','zcu111_mvdr.bit');
-devicetree = 'devicetree_adi_axistream_32.dtb';
-rdName = 'I/Q';
+bitstream = fullfile('binaries','system_wrapper.bit');
+devicetree = 'devicetree.dtb';
+rdName = 'IQ ADC/DAC Interface';
 
 % Create board connection object
 z = zynq;
 
-% Upload customer devicetree to board
-z.putFile(fullfile('binaries',devicetree),'/mnt');
-
 % Program the board
-ZynqRF.common.internal.downloadBitstreamToRFSoC(z,bitstream,devicetree,rdName,{});
+%                                            
+hRDParams = [];
+hRDParams.MW_ADD_DDR4 = 'false';
+hRDParams.MW_AXIS_DATA_WIDTH = '32';
+[status, result]= ZynqRFSoC.common.internal.downloadBitstreamToRFSoC(z,bitstream,devicetree,'',rdName,hRDParams);
+disp(result);
