@@ -77,23 +77,25 @@ classdef RFSoCMVDRDemo < handle
         end
         
         function delete(obj)
-            release(obj.hFPGA);
-            release(obj.hSpecAn);
-            release(obj.hConstellation);
+            if ~isempty(obj.hFPGA)
+                release(obj.hFPGA);
+            end
+            if ~isempty(obj.hSpecAn)
+                release(obj.hSpecAn);
+            end
+            if ~isempty(obj.hConstellation)
+                release(obj.hConstellation);
+            end
         end
         
         function run(obj)
             if ~obj.isRunning
                 obj.isRunning = true;
-               setupListeners(obj);
-               % start(obj.updateTimer); -- disable this timer for now
             end
         end
         
         function stop(obj)
-            if obj.isRunning
-                stop(obj.updateTimer);
-                teardownListeners(obj);
+            if obj.isRunning            
                 obj.isRunning = false;
             end
         end
@@ -160,12 +162,17 @@ classdef RFSoCMVDRDemo < handle
     methods (Access = private)
 
         function setup(obj)
-            
+         
             % Initialize parameters
             setupParameters(obj);
 
             % Setup FPGA interface
-            setupFPGAIO(obj);
+            try
+                setupFPGAIO(obj);
+            catch
+                error(['Could not connect to RFSoC board! Ensure the board is powered on',...
+                      'and you are connected over ethernet before running this application!']);
+            end
             
             % Set registers to default states
             initializeRegisters(obj);
