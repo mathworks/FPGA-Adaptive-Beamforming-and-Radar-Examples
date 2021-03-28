@@ -11,8 +11,36 @@ the beamformer to the ZCU111 RFSoC evaluation board for run-time testing,
 debugging and visualization.
 
 
-## Agenda
+## Files
 
+### mvdr_hdl_sim ###
+
+This model uses the phased array toolbox to demonstrate high-level modeling 
+of adaptive beamforming processing. Comparisons are made to various elaborated 
+versions of the same design starting originally in floating point then
+to eventual fixed-point HDL. Blocks from the fixed-point toolbox were used 
+to aid in this design for computing the adaptive weights using QR decomposition.
+
+### zcu111_mvdr_demo ###
+
+This HDL model uses the same algorithm from the previous design but now integrates 
+it for a ZCU111 RFSoC evaluation kit. Using 4 channels of ADC and DAC looped 
+back on itself, a beam is electronically steered out the DAC and then processed
+by the ADC. Using four inputs, a 4x4 covariance matrix is composed and then 
+QR decomposition is applied to yield optimal steering weights that augment the 
+desired steering angle. 
+
+Demo instructions:
+- Ensure you have the "HDL Coder support package for RFSoC" support package installed https://www.mathworks.com/hardware-support/rfsoc-hdl-coder.html
+- Run the HDL Coder Workflow Advisor for the model "TxSteering_RxMVDR_4x4_HDL_IQ.slx"
+- Program the FPGA after bitstream creation is completed
+- For the cable setup, you will need differnetial SMA connector DC blockers. 
+Connect the differential ADC cables for the ADC Tile 2 (Ch 0 and 1) and Tile 3 (Ch 0 and 1)
+to the DAC Tile 0 Channel 0 1 2 and 3.
+- With the board booted fully and powered on, run the RFSoC_MVDR_Demo.mlapp
+
+
+## Documentation PDF
 
 ### Introduction: Motivation and Challenges
 - Applications: Radar, Comms and Wireless (5G)
