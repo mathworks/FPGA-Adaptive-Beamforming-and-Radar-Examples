@@ -3,6 +3,6 @@
 ## Overview
 
 This repository contains FPGA/HDL demonstrations several beamforming and 
-radar designs for RFSoC.
+radar designs
 
 The license used in this contribution is the XSLA license, which is the most common license for MathWorks staff contributions.
