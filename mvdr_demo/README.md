@@ -43,10 +43,17 @@ to the DAC Tile 0 Channel 0 1 2 and 3.
 
 ADC/DAC Loopback Wiring Details:
 To loop back the 4 DAC and ADC channels with the XM500 board you will need to make the following connections
-![XM500 Wiring](xm500_wiring.png)
+<img src = "xm500_wiring.png" align="center" width="400">
 
+Because these connections are differential, you will need SMA DC Blockers
 
-More specifically:
+Connection details: 
+- RFMC_ADC_04 connects to RFMC_DAC_00
+- RFMC_ADC_05 connects to RFMC_DAC_01
+- RFMC_ADC_06 connects to RFMC_DAC_02
+- RFMC_ADC_07 connects to RFMC_DAC_03 
+
+Note that you will want to make sure the PN differential connections pair up such that P connects to N
 
 
 ## Documentation PDF
