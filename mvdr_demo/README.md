@@ -44,9 +44,14 @@ interference which is artificially  introduced in the transmit signal.
 - For the cable setup, you will need differential SMA connector DC blockers. 
 Connect the differential ADC cables for the ADC Tile 2 (Ch 0 and 1) and Tile 3 (Ch 0 and 1)
 to the DAC Tile 0 Channel 0 1 2 and 3.
-- With the board booted fully and powered on, run the RFSoC_MVDR_Demo.mlapp
+- With the board booted fully and powered on, run the "RFSoC_MVDR_Demo.mlapp"
 
 <img src = "mvdr_app.png" width="600">
+
+You can use this UI app to adjust the angle of arrival for the signal of interest and the interference. 
+To regain stable constellation, change the "Azimuth Angle" value to the signal of interest by adjusting the slider
+to the same angle. Measurements from the MVDR optimized weights are read back from the device to show the beamforming
+response and how nulls are placed to minimize interference.
 
 ##### ADC/DAC Loopback Wiring Details: #####
 
