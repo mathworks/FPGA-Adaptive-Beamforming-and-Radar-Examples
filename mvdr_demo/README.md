@@ -32,8 +32,9 @@ desired steering angle. A QPSK signal of interest is resolved in the presence of
 interference which is artificially  introduced in the transmit signal.
 
 
-Demo instructions:
-- Ensure you have the "HDL Coder support package for RFSoC" support package installed https://www.mathworks.com/hardware-support/rfsoc-hdl-coder.html
+##### Demo instructions: #####
+- Ensure you have the "HDL Coder support package for RFSoC" support package installed
+  https://www.mathworks.com/hardware-support/rfsoc-hdl-coder.html
 - Run the HDL Coder Workflow Advisor for the model "TxSteering_RxMVDR_4x4_HDL_IQ.slx"
 - Program the FPGA after bitstream creation is completed
 - For the cable setup, you will need differential SMA connector DC blockers. 
@@ -41,9 +42,11 @@ Connect the differential ADC cables for the ADC Tile 2 (Ch 0 and 1) and Tile 3 (
 to the DAC Tile 0 Channel 0 1 2 and 3.
 - With the board booted fully and powered on, run the RFSoC_MVDR_Demo.mlapp
 
-ADC/DAC Loopback Wiring Details:
+##### ADC/DAC Loopback Wiring Details: #####
+
 To loop back the 4 DAC and ADC channels with the XM500 board you will need to make the following connections
-<img src = "xm500_wiring.png" align="center" width="400">
+
+<img src = "xm500_wiring.png" width="400">
 
 Because these connections are differential, you will need SMA DC Blockers
 
@@ -53,10 +56,21 @@ Connection details:
 - RFMC_ADC_06 connects to RFMC_DAC_02
 - RFMC_ADC_07 connects to RFMC_DAC_03 
 
+The above names refer to labels on the XM500. Match the SMA connectors to the above physical labels of the XM500. 
+Each lable represents a specific tile/channel:
+- ADC Tile 2 Ch0 maps to RFMC_ADC_04
+- ADC Tile 2 Ch1 maps to RFMC_ADC_05
+- ADC Tile 3 Ch0 maps to RFMC_ADC_06
+- ADC Tile 3 Ch1 maps to RFMC_ADC_07
+- DAC Tile 0 Ch0 maps to RFMC_DAC_00
+- DAC Tile 0 Ch1 maps to RFMC_DAC_01
+- DAC Tile 0 Ch2 maps to RFMC_DAC_02
+- DAC Tile 0 Ch3 maps to RFMC_DAC_03
+
 Note that you will want to make sure the PN differential connections pair up such that P connects to N
 
 
-## Documentation: Background Theory of Operation 
+## Documentation: Background Theory of Operation ##
 A PDF file "FPGA_Adaptive_Beamforming_with_HDL_Coder_and_Zynq_RFSoC.pdf" has been included.
 
 ### Introduction: Motivation and Challenges
