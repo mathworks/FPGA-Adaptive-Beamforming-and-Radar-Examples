@@ -46,6 +46,8 @@ Connect the differential ADC cables for the ADC Tile 2 (Ch 0 and 1) and Tile 3 (
 to the DAC Tile 0 Channel 0 1 2 and 3.
 - With the board booted fully and powered on, run the RFSoC_MVDR_Demo.mlapp
 
+<img src = "mvdr_app.png" width="600">
+
 ##### ADC/DAC Loopback Wiring Details: #####
 
 To loop back the 4 DAC and ADC channels with the XM500 board you will need to make the following connections
