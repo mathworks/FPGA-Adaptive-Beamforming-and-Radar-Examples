@@ -28,16 +28,25 @@ it for a ZCU111 RFSoC evaluation kit. Using 4 channels of ADC and DAC looped
 back on itself, a beam is electronically steered out the DAC and then processed
 by the ADC. Using four inputs, a 4x4 covariance matrix is composed and then 
 QR decomposition is applied to yield optimal steering weights that augment the 
-desired steering angle. 
+desired steering angle. A QPSK signal of interest is resolved in the presence of 
+interference which is artificially  introduced in the transmit signal.
+
 
 Demo instructions:
 - Ensure you have the "HDL Coder support package for RFSoC" support package installed https://www.mathworks.com/hardware-support/rfsoc-hdl-coder.html
 - Run the HDL Coder Workflow Advisor for the model "TxSteering_RxMVDR_4x4_HDL_IQ.slx"
 - Program the FPGA after bitstream creation is completed
-- For the cable setup, you will need differnetial SMA connector DC blockers. 
+- For the cable setup, you will need differential SMA connector DC blockers. 
 Connect the differential ADC cables for the ADC Tile 2 (Ch 0 and 1) and Tile 3 (Ch 0 and 1)
 to the DAC Tile 0 Channel 0 1 2 and 3.
 - With the board booted fully and powered on, run the RFSoC_MVDR_Demo.mlapp
+
+ADC/DAC Loopback Wiring Details:
+To loop back the 4 DAC and ADC channels with the XM500 board you will need to make the following connections
+![XM500 Wiring](/images/logo.png)
+
+
+More specifically:
 
 
 ## Documentation PDF
