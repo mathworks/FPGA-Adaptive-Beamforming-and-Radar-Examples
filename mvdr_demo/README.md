@@ -11,7 +11,7 @@ the beamformer to the ZCU111 RFSoC evaluation board for run-time testing,
 debugging and visualization.
 
 
-## Files
+## MVDR Demo Files
 
 ### mvdr_hdl_sim ###
 
@@ -56,7 +56,8 @@ Connection details:
 Note that you will want to make sure the PN differential connections pair up such that P connects to N
 
 
-## Documentation PDF
+## Documentation: Background Theory of Operation 
+A PDF file "FPGA_Adaptive_Beamforming_with_HDL_Coder_and_Zynq_RFSoC.pdf" has been included.
 
 ### Introduction: Motivation and Challenges
 - Applications: Radar, Comms and Wireless (5G)
