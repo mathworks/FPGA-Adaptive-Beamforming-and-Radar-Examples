@@ -33,8 +33,12 @@ interference which is artificially  introduced in the transmit signal.
 
 
 ##### Demo instructions: #####
-- Ensure you have the "HDL Coder support package for RFSoC" support package installed
-  https://www.mathworks.com/hardware-support/rfsoc-hdl-coder.html
+- Ensure you have the "HDL Coder support package for RFSoC" support package installed which can be found here:
+
+    https://www.mathworks.com/hardware-support/rfsoc-hdl-coder.html 
+    
+    MATLAB R2021a is required to install this as well as Vivado 2020.2
+
 - Run the HDL Coder Workflow Advisor for the model "TxSteering_RxMVDR_4x4_HDL_IQ.slx"
 - Program the FPGA after bitstream creation is completed
 - For the cable setup, you will need differential SMA connector DC blockers. 
