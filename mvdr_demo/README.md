@@ -44,7 +44,10 @@ interference which is artificially  introduced in the transmit signal.
 - For the cable setup, you will need differential SMA connector DC blockers. 
 Connect the differential ADC cables for the ADC Tile 2 (Ch 0 and 1) and Tile 3 (Ch 0 and 1)
 to the DAC Tile 0 Channel 0 1 2 and 3.
-- With the board booted fully and powered on, run the "RFSoC_MVDR_Demo.mlapp"
+- With the board booted fully and powered on, run the "RFSoC_MVDR_Demo.mlapp" by right clicking on it and selecting "run" or 
+running it from the MATLAB command prompt:
+
+`>> RFSoC_MVDR_Demo`
 
 <img src = "mvdr_app.png" width="600">
 
