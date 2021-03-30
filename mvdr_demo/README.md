@@ -43,7 +43,7 @@ to the DAC Tile 0 Channel 0 1 2 and 3.
 
 ADC/DAC Loopback Wiring Details:
 To loop back the 4 DAC and ADC channels with the XM500 board you will need to make the following connections
-![XM500 Wiring](/images/logo.png)
+![XM500 Wiring](xm500_wiring.png)
 
 
 More specifically:
