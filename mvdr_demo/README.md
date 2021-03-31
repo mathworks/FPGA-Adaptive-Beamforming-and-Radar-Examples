@@ -29,7 +29,7 @@ back on itself, a beam is electronically steered out the DAC and then processed
 by the ADC. Using four inputs, a 4x4 covariance matrix is composed and then 
 QR decomposition is applied to yield optimal steering weights that augment the 
 desired steering angle. A QPSK signal of interest is resolved in the presence of 
-interference which is artificially  introduced in the transmit signal.
+interference which is artificially introduced in the transmit signal.
 
 
 ##### Demo instructions: #####
@@ -39,15 +39,19 @@ interference which is artificially  introduced in the transmit signal.
     
     MATLAB R2021a is required to install this as well as Vivado 2020.2
 
-- Run the HDL Coder Workflow Advisor for the model "TxSteering_RxMVDR_4x4_HDL_IQ.slx"
-- Program the FPGA after bitstream creation is completed
+- Run the HDL Coder Workflow Advisor for the model "TxSteering_RxMVDR_4x4_HDL_IQ.slx" up until step 4.3
+- Wait for the bitstream to finish being created. Afterwards, to program the RFSoC, ensure the board is powered on and has been
+  properly configured by using the SD card provided by the Zynq RFSoC Hardware Support Package. Next, run the script provided in the demo
+
+    `>>program_board `
+
 - For the cable setup, you will need differential SMA connector DC blockers. 
 Connect the differential ADC cables for the ADC Tile 2 (Ch 0 and 1) and Tile 3 (Ch 0 and 1)
 to the DAC Tile 0 Channel 0 1 2 and 3.
 - With the board booted fully and powered on, run the "RFSoC_MVDR_Demo.mlapp" by right clicking on it and selecting "run" or 
 running it from the MATLAB command prompt:
 
-`>> RFSoC_MVDR_Demo`
+    `>> RFSoC_MVDR_Demo`
 
 <img src = "mvdr_app.png" width="600">
 
