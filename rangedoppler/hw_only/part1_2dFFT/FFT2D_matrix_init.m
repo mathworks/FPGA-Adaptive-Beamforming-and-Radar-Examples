@@ -25,8 +25,21 @@ MatrixInput = iqRaw;
 
 %% compute expected output
 matrixInFixedPoint = fi(MatrixInput,DTsig_in);
+
+% Window along rows
 matrixTaperedRow = matrixInFixedPoint.*repmat(fi(rowWindowFun(:),DTWindowFun),1,nCols);
+% Treating each column as a seperate FFT
 matrixTaperAndFFT = cast(fft(double(matrixTaperedRow),[],1)/nRows,'like',matrixTaperedRow(1));
-matrixTaperFFTandTranspose = fi(matrixTaperAndFFT,1,32,25).';
-matrix2DFFT = fi(fft(double(matrixTaperFFTandTranspose.*repmat(fi(columnWindowFun(:),DTWindowFun),1,nRows)),[],1)/nCols,DToutput);
+
+
+matrixTaperFFTandTranspose = fi(matrixTaperAndFFT,1,32,25).'; % Transpose
+
+% Window along column
+matrixTaperColumn = repmat(fi(columnWindowFun(:),DTWindowFun),1,nRows);
+matrix2DFFT = fi(fft(double(matrixTaperFFTandTranspose.*matrixTaperColumn),[],1)/nCols,DToutput);
 MatrixOutput = matrix2DFFT;
+
+%% Plot
+
+imagesc(20*log(abs(double(MatrixOutput))))
+title('Expected output')
