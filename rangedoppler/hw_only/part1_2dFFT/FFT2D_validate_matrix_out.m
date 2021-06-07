@@ -34,16 +34,16 @@ fft1_valid=getLogged(out.logsout,'mm2s_tvalid');
 fft1_out = fft1_out(fft1_valid);
 
 fft1_out = fft1_out((1:nRows*nCols)');
-disp(['Taper&FFT1 check: ' num2str(max(abs(fft1_out-matrixTaperAndFFT(:))))]);
+disp(['Taper & FFT1 check: ' num2str(max(abs(fft1_out-matrixTaperAndFFT(:))))]);
 nexttile; imagesc(db(double(matrixTaperAndFFT))); title('Taper&FFT1 - expected'); colorbar;
-nexttile; imagesc(db(double(reshape(fft1_out,nRows,nCols)))); title('Taper&FFT1 - actual'); colorbar;
+nexttile; imagesc(db(double(reshape(fft1_out,nRows,nCols)))); title('Taper & FFT1 - actual'); colorbar;
 
 input_matrix_2 = getLogged(out.logsout,'input_matrix_2');
 input_valid_2=getLogged(out.logsout,'input_valid_2');
 input_matrix_2 = input_matrix_2(input_valid_2);
 
 input_matrix_2 = input_matrix_2(1:nRows*nCols);
-nexttile; imagesc(db(double(reshape(input_matrix_2,nCols,nRows)))); title('Taper,FFT1,Transpose')
+nexttile; imagesc(db(double(reshape(input_matrix_2,nCols,nRows)))); title('Taper, FFT1, Transpose')
 
 %%
 Valid = out.rdValid(:);
@@ -51,5 +51,5 @@ rdMat = out.rdMat(:);
 rdMat = rdMat(Valid);
 rdMat = rdMat((1:nRows*nCols)');
 disp(['FFT2D check: ' num2str(max(abs(rdMat-reshape(matrix2DFFT,nRows*nCols,1))))]);
-nexttile; imagesc(db(double(matrix2DFFT))); title('2DFFT&transpose - expected'); colorbar;
-nexttile; imagesc(db(double(reshape(rdMat,nCols,nRows)))); title('2DFFT &transpose - actual'); colorbar;
+nexttile; imagesc(db(double(matrix2DFFT))); title('2DFFT & transpose - expected'); colorbar;
+nexttile; imagesc(db(double(reshape(rdMat,nCols,nRows)))); title('2DFFT & transpose - actual'); colorbar;
