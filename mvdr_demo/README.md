@@ -21,6 +21,8 @@ versions of the same design starting originally in floating point then
 to eventual fixed-point HDL. Blocks from the fixed-point toolbox were used 
 to aid in this design for computing the adaptive weights using QR decomposition.
 
+Two examples for 4x4 and 16x16 MVDR matrix solves have been provided.
+
 ### zcu111_mvdr_demo ###
 
 This HDL model uses the same algorithm from the previous design but now integrates 
