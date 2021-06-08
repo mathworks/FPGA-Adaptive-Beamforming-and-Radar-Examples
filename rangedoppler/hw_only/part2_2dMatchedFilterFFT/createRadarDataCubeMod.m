@@ -51,7 +51,7 @@ for nn=1:NumCPI
         [~,ang] = rangeangle(TgtPos);
         temp = rxCollector(temp,ang);
         temp = rx(temp);
-        dataCube(:,ii,nn) = temp(RngGateSamples+1:end,:);
+        dataCube(:,ii,nn) = temp(uint32(RngGateSamples+1):end,:);
     end
     T = T+CPIDelta;
 end

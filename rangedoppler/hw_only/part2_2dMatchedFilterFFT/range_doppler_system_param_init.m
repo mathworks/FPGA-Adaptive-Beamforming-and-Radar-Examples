@@ -22,7 +22,7 @@ CPILength = 64; % Number of pulses in a Coherent Processing Interval
 
 % totalSamplesPulse = Fs/PRF;
 % = 4250;
-RxActiveSamples = 512;
+RxActiveSamples = 256;
 RngGateSamples  = 8346 - RxActiveSamples;
 
 % Derived params
@@ -64,7 +64,7 @@ target1Speed = 100;
 target1RCS = 2.5;
 
 target2Az = 50;
-target2Dist = 4800;
+target2Dist = 4900;
 target2Speed = -150;
 target2RCS = 4;
 
