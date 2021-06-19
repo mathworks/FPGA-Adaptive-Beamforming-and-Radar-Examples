@@ -14,7 +14,7 @@ run AXIBusObjects;
 pAXIDataWidthBytes = 4; % number of bytes (128 bits) for AXI Data-Width
 inputImageDDROffset = uint32(hex2dec('00000000')); % addr = 0x8000-0000
 
-pMaxBankLines = 6;
+pMaxBankLines = 8;
 pMaxNumBanks = 3;
 
 pNumCols = 30;
