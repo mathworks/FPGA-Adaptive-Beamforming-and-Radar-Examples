@@ -32,7 +32,7 @@ transpose_fpgaIO_setup(hFPGA,frameSize);
 %% AXI4-Stream DMA
 % writePort(hFPGA, "DataIn", zeros([1 1024]));
 % data_tdata_o = readPort(hFPGA, "tdata_o");
-for ii = 1:10
+for ii = 1:50
     MatrixInputArr = [1:N1*N2]*ii;
     MatrixInput = reshape(MatrixInputArr,[N1,N2]);
 

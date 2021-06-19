@@ -53,3 +53,12 @@ rdMat = rdMat((1:nRows*nCols)');
 disp(['FFT2D check: ' num2str(max(abs(rdMat-reshape(matrix2DFFT,nRows*nCols,1))))]);
 nexttile; imagesc(db(double(matrix2DFFT))); title('2DFFT & transpose - expected'); colorbar;
 nexttile; imagesc(db(double(reshape(rdMat,nCols,nRows)))); title('2DFFT & transpose - actual'); colorbar;
+
+
+%% Alternative view
+img = reshape(rdMat,nCols,nRows);
+cubeOutput = fftshift(transpose(img),2);
+cubeOutput = 20*log10(abs(cubeOutput));
+
+imagesc(cubeOutput)
+

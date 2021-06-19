@@ -1,7 +1,7 @@
 %% Model setup
 
-nRows = 256;
-nCols = 64;
+nRows = 256; % samples to capture per pulse
+nCols = 64; % Number of pulses
 
 % create an input matrix 
 rowWindowFun = taylorwin(nRows,10,-35);%.*(-1.^(1:nRows)'); 
