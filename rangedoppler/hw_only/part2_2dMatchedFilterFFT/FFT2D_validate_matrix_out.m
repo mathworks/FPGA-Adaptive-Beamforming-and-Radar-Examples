@@ -4,12 +4,6 @@ rdMat = out.rdMat(:);
 rdMat = rdMat(Valid);
 iter = length(rdMat)/(nRows*nCols);
 
-for ii = 1:iter
-    range = (1:nRows*nCols) + (ii-1)*(nRows*nCols);
-    rdOut = reshape(rdMat(range),[nCols,nRows]);
-    compare = MatrixOutput;
-    disp(['Iteration ' num2str(ii) ', max diff = ' num2str(max(abs(rdOut(:)-compare(:))))]);
-end
 
 %% check intermediate results of transpose
 fft1_out=getLogged(out.logsout,'fft1_out');
