@@ -11,13 +11,13 @@ iter = length(rdMat)/(N1*N2);
 
 %% Compare against original radar data cube
 
-outputReshape = reshape(rdMat,pNumCols,pNumRows,iter);
-expectedOutput = radarDataCube.';
-
-for ii = 1:iter
-    matrix_subset = outputReshape(:,:,ii);
-    plot(imag(matrix_subset(:) - expectedOutput(:)))
-end
+% outputReshape = reshape(rdMat,pNumCols,pNumRows,iter);
+% expectedOutput = radarDataCube.';
+% 
+% for ii = 1:iter
+%     matrix_subset = outputReshape(:,:,ii);
+%     plot(imag(matrix_subset(:) - expectedOutput(:)))
+% end
 
 
 %% Compare raw int64 inputs

@@ -15,11 +15,11 @@ hdlbramBurst.pMaxBankLines = 6;
 hdlbramBurst.pMaxNumBanks = 3;
 
 %Bram address width
-hdlbramBurst.pBramAddrWidth = ceil(log2(pMaxBankLines*pMaxNumBanks*hdlbramBurst.pNumCols));
+hdlbramBurst.pBramAddrWidth = ceil(log2(hdlbramBurst.pMaxBankLines*hdlbramBurst.pMaxNumBanks*hdlbramBurst.pNumCols));
 
 %BRAM savings
-bramSaving = (  1 - pMaxBankLines*pMaxNumBanks*hdlbramBurst.pNumCols / (hdlbramBurst.pNumCols*hdlbramBurst.pNumRows))*100;
-fprintf('By using DDR4 memory we reduced BRAM usage of the transpose by %2.1f percent. Address width is %d-bits \n',bramSaving,pBramAddrWidth);
+bramSaving = (  1 - hdlbramBurst.pMaxBankLines*hdlbramBurst.pMaxNumBanks*hdlbramBurst.pNumCols / (hdlbramBurst.pNumCols*hdlbramBurst.pNumRows))*100;
+fprintf('By using DDR4 memory we reduced BRAM usage of the transpose by %2.1f percent. Address width is %d-bits \n',bramSaving,hdlbramBurst.pBramAddrWidth);
 
 % State machine labeling
 % LINEBUFFER = fi(1,0,4,0);
