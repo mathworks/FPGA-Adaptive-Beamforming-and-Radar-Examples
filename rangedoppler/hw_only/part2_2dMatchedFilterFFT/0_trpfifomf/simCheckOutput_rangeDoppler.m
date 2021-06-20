@@ -2,7 +2,7 @@
 Valid = out.rdValid(:);
 rdMat = out.rdMat(:);
 rdMat = rdMat(Valid);
-iter = length(rdMat)/(N1*N2);
+iter = floor(length(rdMat)/(N1*N2));
 
 
 

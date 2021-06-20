@@ -6,7 +6,7 @@
 N1 = 256; % row
 N2 = 64; % columns
 
-enableFullMatrixWrite = false;
+enableFullMatrixWrite = true;
 debugInputFrame = true;
 %--------------------------------------------------------------------------
 % Adjustable Design parameters 
@@ -84,26 +84,23 @@ end
 %%  read and Unpack
 rangeDopplerRead = readPort(hFPGA, "axis_s2mm_tdata");
 
+data_ddrDoneCounter = readPort(hFPGA, "ddrDoneCounter");
+fprintf('DDR4 write count = %d \n', uint32(data_ddrDoneCounter));
+
 if ~debugInputFrame
     re = reinterpretcast(bitsliceget(rangeDopplerRead,32,1),numerictype(1,32,21)) ;
     imag = reinterpretcast(bitsliceget(rangeDopplerRead,64,33),numerictype(1,32,21)) ;
     rdMat = complex(re,imag);
 else
     output_data = reshape(rangeDopplerRead,64,256);
-    
-    % do a diff:
-    
     expectedTranspose = double(radarDataCube_fi_mat.');
     plot(output_data(:) - expectedTranspose(:))
+    xlabel('Samples')
+    title('Error for Expected vs Actual BRAM Burst transpose');
     
 end
-%% Write/read DUT ports
-% Uncomment the following lines to write/read DUT ports in the generated IP Core.
-% Update the example data in the write commands with meaningful data to write to the DUT.
-%% AXI4
-% writePort(hFPGA, "inputImageDDROffset", zeros([1 1]));
-data_ddrDoneCounter = readPort(hFPGA, "ddrDoneCounter");
-fprintf('DDR4 write count = %d \n', uint32(data_ddrDoneCounter));
+
+%% AXI4 debug register reads
 data_fifo_full_event = readPort(hFPGA, "fifo_full_event");
 
 fprintf('Number of samples FIFO outputted = %d \n',data_debugRead.FIFO_ValidWriteCount);
@@ -115,17 +112,18 @@ fprintf('Number of times FIFO was full = %d \n',data_debugRead.FIFO_FullEventCou
 
 
 %%
-img = reshape(double(rdMat),64,256);
- 
-cubeOutput = fftshift(transpose(img),2);
-cubeOutput = 20*log10(abs(cubeOutput));
+if ~debugInputFrame
+    img = reshape(double(rdMat),64,256);
+    cubeOutput = fftshift(transpose(img),2);
+    cubeOutput = 20*log10(abs(cubeOutput));
 
-nexttile([1,2]);
-imagesc([-VelMax VelMax],[RngMin RngMax],cubeOutput);
-title('Range-Doppler');
-xlabel('Velocity');
-ylabel('Range');
-colorbar;
+    nexttile([1,2]);
+    imagesc([-VelMax VelMax],[RngMin RngMax],cubeOutput);
+    title('Range-Doppler');
+    xlabel('Velocity');
+    ylabel('Range');
+    colorbar;
+end
 
 
 
@@ -143,7 +141,4 @@ function output = packBits(waveformInput)
 
 end
 
-function output = unpackBits(waveformInput)
-    
-end
 
