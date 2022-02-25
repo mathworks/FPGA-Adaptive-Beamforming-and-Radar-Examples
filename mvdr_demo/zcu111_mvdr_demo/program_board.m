@@ -1,23 +1,71 @@
-%   program_board Utility script to program the board after bitstream generation
+function program_board(varargin)
+%program_board Utility function to program the board after bitstream generation
 %
-%   Copyright 2021 The MathWorks, Inc.
+%  program_board() programs the board with the bitfile found in hdl_prj.
+%
+%  program_board('ParameterName', Value) can be used to specify additional parameters:
+%   
+%    'IPAddress'     - IP address of the board.
+%    'VivadoPrjDir'  - Vivado project directory name. (ignored if BitfilePath is specified)
+%    'BitfilePath'   - Path to bitfile. (relative or full)
+%
+%   Copyright 2021-2022 The MathWorks, Inc.
 
-vivado_path = fullfile(fileparts(hdlget_param(bdroot,'TargetDirectory')),'vivado_ip_prj');
-bitstream_path = fullfile(vivado_path,'vivado_prj.runs','impl_1','system_wrapper.bit');
-if isempty(ls(bitstream_path))
-    error('Bitstream not found! Ensure that synthesis, place/route and bitstream creation has fully completed!');
+p = inputParser;
+p.addOptional('IPAddress','');
+p.addOptional('VivadoPrjDir',fullfile('hdl_prj','vivado_ip_prj'));
+p.addOptional('BitfilePath','');
+p.addOptional('DeviceTree','');
+p.addOptional('WaitForReboot',false);
+p.parse(varargin{:});
+args = p.Results;
+
+IPAddress = args.IPAddress;
+VivadoPrjDir = args.VivadoPrjDir;
+BitfilePath = args.BitfilePath;
+
+% Search for the bitfile if none specified
+if isempty(BitfilePath)
+    files = dir(VivadoPrjDir);
+    runsDir = '';
+    for ii=1:length(files)
+        if regexp(files(ii).name,'.+\.runs')
+            runsDir = files(ii).name;
+            break
+        end
+    end
+    if isempty(runsDir)
+        error('Could not find a .runs directory in %s.',VivadoPrjDir)
+    end
+    BitfileDirPath = fullfile(VivadoPrjDir,runsDir,'impl_1');
+    BitfileDirContents = dir(BitfileDirPath);
+    fileNames = {BitfileDirContents.name};
+    matchIdx = cellfun(@(x) endsWith(x,'.bit'), fileNames);
+    if ~any(matchIdx)
+        error('Directory ''%s'' does not contain a .bit file.',BitfileDirPath)
+    end
+    validFiles = fileNames(matchIdx);
+    BitfileName = validFiles{1}; % use first entry found
+    BitfilePath = fullfile(BitfileDirPath,BitfileName);
+else
+    if ~isfile(BitfilePath)
+        error('Invalid bitfile path.')
+    end
 end
 
-devicetree = 'devicetree.dtb';
-rdName = 'IQ ADC/DAC Interface';
-
 % Create board connection object
-z = zynq;
+h = ZynqRFSoC.common.internal.zynqrf;
+if ~isempty(IPAddress)
+    h.IPAddress = IPAddress;
+end
 
 % Program the board
-%                                            
-hRDParams = [];
+devicetree = 'devicetree.dtb';
+rdName = 'IQ ADC/DAC Interface';
+hRDParams = struct();
 hRDParams.MW_ADD_DDR4 = 'false';
 hRDParams.MW_AXIS_DATA_WIDTH = '32';
-[status, result]= ZynqRFSoC.common.internal.downloadBitstreamToRFSoC(z,bitstream_path,devicetree,'',rdName,hRDParams);
+[~, result]= ZynqRFSoC.common.internal.downloadBitstreamToRFSoC(h,BitfilePath,devicetree,'',rdName,hRDParams);
 disp(result);
+
+end

@@ -33,27 +33,38 @@ QR decomposition is applied to yield optimal steering weights that augment the
 desired steering angle. A QPSK signal of interest is resolved in the presence of 
 interference which is artificially introduced in the transmit signal.
 
+##### Required software #####
 
-##### Demo instructions: #####
-- Ensure you have the "HDL Coder support package for RFSoC" support package installed which can be found here:
+Xilinx Vivado 2020.2
 
-    https://www.mathworks.com/hardware-support/rfsoc-hdl-coder.html 
-    
-    MATLAB R2021a is required to install this as well as Vivado 2020.2
+MATLAB R2021b with the following add-ons:
+- Simulink
+- HDL Coder
+- Fixed-Point Designer
+- DSP System Toolbox
+- Communications Toolbox
+- Phased Array System Toolbox
+- [HDL Coder Support Package for Xilinx RFSoC Devices](https://www.mathworks.com/hardware-support/rfsoc-hdl-coder.html )
 
-- Run the HDL Coder Workflow Advisor for the model "TxSteering_RxMVDR_4x4_HDL_IQ.slx" up until step 4.3
-- Wait for the bitstream to finish being created. Afterwards, to program the RFSoC, ensure the board is powered on and has been
-  properly configured by using the SD card provided by the Zynq RFSoC Hardware Support Package. Next, run the script provided in the demo
+##### Run the demo #####
 
-    `>>program_board `
+1. Ensure the ZCU111 board has been configured with the SD card provided by the HDL Coder RFSoC Support Package.
+  See [this page](https://www.mathworks.com/help/releases/R2021b/supportpkg/xilinxrfsocdevices/ug/guided-sd-card-setup.html) for more information.
 
-- For the cable setup, you will need differential SMA connector DC blockers. 
-Connect the differential ADC cables for the ADC Tile 2 (Ch 0 and 1) and Tile 3 (Ch 0 and 1)
-to the DAC Tile 0 Channel 0 1 2 and 3.
-- With the board booted fully and powered on, run the "RFSoC_MVDR_Demo.mlapp" by right clicking on it and selecting "run" or 
-running it from the MATLAB command prompt:
+2. On the XM500 balun card, connect the differential ADC cables for the ADC Tile 2 (Channel 0 and 1) and Tile 3 (Channel 0 and 1)
+to the DAC Tile 0 Channel 0 1 2 and 3. See [section below](#adcdac-loopback-wiring-details) for more details.
+ 
+3. Power-on the board and program the prebuilt FPGA bitstream:
 
-    `>> RFSoC_MVDR_Demo`
+	`>> program_board('BitfilePath','binaries/zcu111_mvdr.bit')`
+
+4. After the board reboots, run the setup script to configure the RF Data Converter:
+
+	`>> setup_rfsoc`
+
+5. Run "RFSoC_MVDR_Demo.mlapp" by right clicking on it and selecting "run" or running it from the MATLAB command prompt:
+
+	`>> RFSoC_MVDR_Demo`
 
 <img src = "mvdr_app.png" width="600">
 
@@ -62,13 +73,35 @@ To regain stable constellation, change the "Azimuth Angle" value to the signal o
 to the same angle. Measurements from the MVDR optimized weights are read back from the device to show the beamforming
 response and how nulls are placed to minimize interference.
 
-##### ADC/DAC Loopback Wiring Details: #####
+##### Build the demo #####
 
-To loop back the 4 DAC and ADC channels with the XM500 board you will need to make the following connections
+To rebuild the bitstream from scratch, follow these instructions.
+
+1. Open "TxSteering_RxMVDR_4x4_HDL_IQ.slx"
+
+2. Right-click on the "DUT" subsystem, then click HDL Code → HDL Workflow Advisor
+
+3. In the HDL Workflow Advisor, right-click on step 4.3, then click "Run to selected task".
+  For more details on the individual steps of HDLWFA, please see this [example](https://www.mathworks.com/help/releases/R2021b/supportpkg/xilinxrfsocdevices/ug/DACAndADCLoopbackDataCaptureExample.html).
+
+4. Wait for the Vivado command window to show that bitstream generation has finished.
+
+5. Run provided utility function to program the board:
+  
+  NOTE: You must use this to program the board instead of HDL WFA step 4.4.
+
+   `>> program_board`
+
+6. Proceed from step 4 in the Demo instructions.
+
+
+##### ADC/DAC Loopback Wiring Details #####
+
+To loop back the 4 DAC and ADC channels with the XM500 board you will need to make the following connections:
 
 <img src = "xm500_wiring.png" width="400">
 
-Because these connections are differential, you will need SMA DC Blockers
+Because these connections are differential, you will need SMA DC Blocks.
 
 Connection details: 
 - RFMC_ADC_04 connects to RFMC_DAC_00
@@ -77,7 +110,7 @@ Connection details:
 - RFMC_ADC_07 connects to RFMC_DAC_03 
 
 The above names refer to labels on the XM500. Match the SMA connectors to the above physical labels of the XM500. 
-Each lable represents a specific tile/channel:
+Each label represents a specific tile/channel:
 - ADC Tile 2 Ch0 maps to RFMC_ADC_04
 - ADC Tile 2 Ch1 maps to RFMC_ADC_05
 - ADC Tile 3 Ch0 maps to RFMC_ADC_06
@@ -87,7 +120,7 @@ Each lable represents a specific tile/channel:
 - DAC Tile 0 Ch2 maps to RFMC_DAC_02
 - DAC Tile 0 Ch3 maps to RFMC_DAC_03
 
-Note that you will want to make sure the PN differential connections pair up such that P connects to N
+Note that the PN differential connections pair up such that P connects to N.
 
 
 ## Documentation: Background Theory of Operation ##
