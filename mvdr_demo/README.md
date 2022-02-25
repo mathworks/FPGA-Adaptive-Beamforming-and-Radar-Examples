@@ -88,9 +88,9 @@ To rebuild the bitstream from scratch, follow these instructions.
 
 5. Run provided utility function to program the board:
   
-  NOTE: You must use this to program the board instead of HDL WFA step 4.4.
+	NOTE: You must use this to program the board instead of HDL WFA step 4.4.
 
-   `>> program_board`
+	`>> program_board`
 
 6. Proceed from step 4 in the Demo instructions.
 

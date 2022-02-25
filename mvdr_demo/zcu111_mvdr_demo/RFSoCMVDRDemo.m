@@ -27,7 +27,7 @@ classdef RFSoCMVDRDemo < handle
     
     properties (Hidden, Constant)
         % Update rate, in Hz
-        UPDATE_RATE = 10;
+        UPDATE_RATE = 2;
     end
     
     properties (Access = private)
@@ -278,7 +278,7 @@ classdef RFSoCMVDRDemo < handle
             writePort(obj.hFPGA, "rx_capture_trig", false);
 
             % Read a frame
-            data = uint32(readPort(obj.hFPGA, "S2MM_Data"));
+            data = readPort(obj.hFPGA, "S2MM_Data");
 
             % Unpack uint32 to complex int16
             data = unpack_complex(data);
@@ -505,7 +505,7 @@ classdef RFSoCMVDRDemo < handle
 
             hPort_S2MM_Data = hdlcoder.DUTPort("S2MM_Data", ...
                 "Direction", "OUT", ...
-                "DataType", numerictype(0,32,0), ...
+                "DataType", 'uint32', ...
                 "Dimension", [1 1], ...
                 "IOInterface", "AXI4-Stream DMA");
 
