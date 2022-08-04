@@ -10,8 +10,15 @@ M=4;
 % Calculate payload length
 NPayloadLength=FrameLength-PreambleLength; 
 
-% use random data for preamble
-preamble=randi([0 M-1],PreambleLength,1);
+% use Barker code for preamble
+barkerCode = step(comm.BarkerCode('Length',PreambleLength,'SamplesPerFrame',PreambleLength));
+
+% map preamble to Gray code symbols.
+% -1 -> 1, +1 -> 0
+temp = (-barkerCode + 1) / 2;
+temp = [temp temp]';
+temp = temp(:);
+preamble = bit2int(temp,2);
 
 % copy preamble so it can be inserted at start of each frame
 preamble_frames=preamble*ones(1,NFrames);

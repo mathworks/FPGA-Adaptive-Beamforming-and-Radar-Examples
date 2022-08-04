@@ -39,7 +39,7 @@ rng('default');
 testSrc1 = struct();
 testSrc1.NFrames=15;
 testSrc1.FrameLength=256;
-testSrc1.PreambleLength=24;
+testSrc1.PreambleLength=13;
 testSrc1.SamplesPerSymbol=4;
 
 [testSrc1.Data,testSrc1.mfCoeffs,testSrc1.rrcCoeffs] = ...
@@ -49,7 +49,7 @@ testSrc1.SamplesPerSymbol=4;
 testSrc2 = struct();
 testSrc2.NFrames=7;
 testSrc2.FrameLength=128;
-testSrc2.PreambleLength=24;
+testSrc2.PreambleLength=13;
 testSrc2.SamplesPerSymbol=16;
 testSrc2.Data = ...
     generate_qpsk_signal(testSrc2.NFrames,testSrc2.FrameLength,...

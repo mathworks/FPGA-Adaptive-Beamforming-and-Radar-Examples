@@ -41,8 +41,8 @@ rxRotated = rxDataAligned*conj(exp(1j*rotationAngle));
 % Apply RRC filter
 rxFiltered = filter(rrcCoeffs,1,rxRotated);
 
-% Downsample after RRC filter
-dataOut = rxFiltered(1:SamplesPerSymbol:end);
+% Downsample after RRC filter (and discard filter transient)
+dataOut = rxFiltered((SamplesPerSymbol*8):SamplesPerSymbol:end);
 
 end
 
