@@ -37,11 +37,12 @@ interference which is artificially introduced in the transmit signal.
 
 Xilinx Vivado 2020.2
 
-MATLAB R2021b with the following add-ons:
+MATLAB R2023a with the following add-ons:
 - Simulink
 - HDL Coder
 - Fixed-Point Designer
 - DSP System Toolbox
+- DSP HDL Toolbox
 - Communications Toolbox
 - Phased Array System Toolbox
 - [HDL Coder Support Package for Xilinx RFSoC Devices](https://www.mathworks.com/hardware-support/rfsoc-hdl-coder.html )
@@ -56,7 +57,7 @@ to the DAC Tile 0 Channel 0 1 2 and 3. See [section below](#adcdac-loopback-wiri
  
 3. Power-on the board and program the prebuilt FPGA bitstream:
 
-	`>> program_board('BitfilePath','binaries/zcu111_mvdr.bit')`
+	`>> program_board('BitfilePath','prebuilt/zcu111_mvdr.bit')`
 
 4. After the board reboots, run the setup script to configure the RF Data Converter:
 

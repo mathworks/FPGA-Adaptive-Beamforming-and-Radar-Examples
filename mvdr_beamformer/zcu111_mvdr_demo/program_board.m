@@ -14,7 +14,7 @@ function program_board(varargin)
 p = inputParser;
 p.addOptional('IPAddress','');
 p.addOptional('VivadoPrjDir',fullfile('hdl_prj','vivado_ip_prj'));
-p.addOptional('BitfilePath','');
+p.addOptional('BitfilePath',fullfile('prebuilt','zcu111_mvdr.bit'));
 p.addOptional('DeviceTree','');
 p.addOptional('WaitForReboot',false);
 p.parse(varargin{:});
@@ -59,6 +59,14 @@ if ~isempty(IPAddress)
     h.IPAddress = IPAddress;
 end
 
+% Copy RF_Init.cfg
+BitfileDirPath = fileparts(BitfilePath);
+cfgfilePath = fullfile(BitfileDirPath,'RF_Init.cfg');
+cfgfilePathLocal = fullfile(pwd,'RF_Init.cfg');
+if isfile(cfgfilePath)
+    copyfile(cfgfilePath,cfgfilePathLocal);
+end
+
 % Program the board
 devicetree = 'devicetree.dtb';
 rdName = 'IQ ADC/DAC Interface';
@@ -67,5 +75,9 @@ hRDParams.MW_ADD_DDR4 = 'false';
 hRDParams.MW_AXIS_DATA_WIDTH = '32';
 [~, result]= ZynqRFSoC.common.internal.downloadBitstreamToRFSoC(h,BitfilePath,devicetree,'',rdName,hRDParams);
 disp(result);
+
+if isfile(cfgfilePathLocal)
+    delete(cfgfilePathLocal);
+end
 
 end

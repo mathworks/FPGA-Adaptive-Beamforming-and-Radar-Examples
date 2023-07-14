@@ -1,8 +1,14 @@
-% ADC/DAC sampling rate
+%model_init Setup for TxSteering_RxMVDR_4x4_HDL_IQ.slx
 %
-%   Copyright 2021 The MathWorks, Inc.
+%   Copyright 2021-2023 The MathWorks, Inc.
 
+%% Add common folder to path
+thisDir = fileparts(mfilename('fullpath'));
+addpath(fullfile(thisDir,'..','common'));
 
+%% RF Data Converter parameters
+
+% RF ADC/DAC sampling rate
 ConverterSampleRate = 1966.08e6; 
 
 % DDC/DUC factor
@@ -27,11 +33,6 @@ SampleDataWidth = 16*2; % 16-bit I/Q samples
 % Channel data width
 ChannelDataWidth = SampleDataWidth*VectorSamplingFactor;
 
-% Tx NCO parameters
-NCO_bits = 14;
-NCO_default_freq = 10e6;
-NCO_default_inc = floor(NCO_default_freq*2^NCO_bits/DataSampleRate);
-
 %% Create test source data
 
 rng('default');
@@ -55,12 +56,20 @@ testSrc2.Data = ...
     generate_qpsk_signal(testSrc2.NFrames,testSrc2.FrameLength,...
         testSrc2.PreambleLength,testSrc2.SamplesPerSymbol);
 
-%% DMA
-S2MM_frame_size = testSrc1.FrameLength*testSrc1.SamplesPerSymbol*3;
+%% DMA capture parameters
+
+% For QPSK demod we capture 3 frames of data so that it contains at least
+% one full contigious frame
+
+% S2MM DMA frame size
+s2mmFrameSize = testSrc1.FrameLength*testSrc1.SamplesPerSymbol*3;
+
+% Length of FIFO to handle backpressure from DMA
+dmaFIFOLength = 2^nextpow2(testSrc1.FrameLength*testSrc1.SamplesPerSymbol*2);
 
 %% Environment
 propSpeed = physconst('LightSpeed');   % Propagation speed
-fc = ConverterSampleRate/4;           % Operating frequency
+fc = ConverterSampleRate*7/16;           % Operating frequency
 lambda = propSpeed/fc;
 
 %% Beamformer parameters
@@ -75,8 +84,16 @@ sensorArray = phased.ULA('NumElements',numArrayElements,'ElementSpacing',0.5*lam
 steeringVector = phased.SteeringVector('SensorArray',sensorArray);
 
 % Moving average window size
-% pick this to have a power of 2 square root
 windowSize = 4096;
+
+% Diagonal loading value
+diagLoading = 5e-3;
+
+%% Calibration Tx NCO parameters
+
+NCO_bits = 14;
+NCO_default_freq = 10e6;
+NCO_default_inc = fi(floor(NCO_default_freq*2^NCO_bits/DataSampleRate), 1,NCO_bits,0);
 
 %% Fixed point datatypes
 
@@ -92,34 +109,64 @@ covmat_dt = fixdt(1,18,16);
 % Moving average
 movavg_bitgrowth = nextpow2(windowSize);
 movavg_accum_dt = fixdt(1,covmat_dt.WordLength+movavg_bitgrowth,covmat_dt.FractionLength);
-movavg_bitshift = nextpow2(sqrt(windowSize));
+movavg_bitshift = nextpow2(windowSize);
 movavg_out_dt = fixdt(1,movavg_accum_dt.WordLength-movavg_bitshift,movavg_accum_dt.FractionLength);
 
+% Use helper function to select types for matrix solver
+max_abs_A = sqrt(2);  % Upper bound on max(abs(A(:))
+max_abs_B = sqrt(2);  % Upper bound on max(abs(B(:))
+matrix_solve_precision = 18;   % Number of bits of precision
+T = fixed.complexQRMatrixSolveFixedpointTypes(numArrayElements,numArrayElements,...
+    max_abs_A,max_abs_B,matrix_solve_precision);
+
+% Matrix solve input
+matrixdivin_dt = fixed.extractNumericType(T.A);
+
+% Matrix solve back-substitition
+matrixdivbacksub_dt = fixed.extractNumericType(T.X);
+
+% Matrix solve output
+matrixdivout_dt = fixdt(1,24,matrix_solve_precision);
+
 % Steering vector
-sv_dt = fixdt(1,16,14);
+sv_dt = fixdt(1,18,16);
 
-% Matrix divide input
-matrixdivin_dt = fixdt(1,22,11);
+% Inner product bit growth
+ip_bitgrowth = (matrixdivout_dt.WordLength-matrixdivout_dt.FractionLength) + ...
+    (sv_dt.WordLength - sv_dt.FractionLength) + 2;
 
-% Matrix divide back-substitition
-matrixdivbacksub_dt = fixdt(1,32,15);
+% Reciprocal input
+reciprocalin_wl = 26;
+reciprocalin_dt = fixdt(1,reciprocalin_wl,reciprocalin_wl-ip_bitgrowth);
 
-% Matrix divide output
-matrixdivout_dt = fixdt(1,24,16);
+% Reciprocal output
+reciprocalout_dt = fixdt(1,reciprocalin_dt.WordLength,reciprocalin_dt.WordLength-4);
 
 % Weight vector
-w_dt = fixdt(1,24,23);
+w_dt = fixdt(1,26,22);
 
 % Rx/Tx channel coefficients
 coeff_dt = fixdt(1,18,16);
 
 % Output
-output_dt = fixdt(1,32,30);
+output_dt = fixdt(1,32,26);
 
 % Tx output gain
 tx_gain_dt = fixdt(1,16,14);
 
-%% CORDIC matrix divide parameters
+%% Rx magnitude measurement parameters
+
+rx_mag_window_size = 256;
+rx_mag_sum_growth = nextpow2(rx_mag_window_size);
+
+rx_mag_dt = fixdt(0,input_dt.WordLength,input_dt.FractionLength);
+rx_mag_inv_dt = fixdt(1,27,16);
+rx_gain_dt = fixdt(1,rx_mag_inv_dt.WordLength-1,rx_mag_inv_dt.FractionLength);
+
+rx_mag_delay = input_dt.WordLength + 2 + ceil(log2(NumChan)) + 1 + rx_mag_window_size;
+rx_mag_inverse_delay = nextpow2(rx_mag_dt.WordLength) + 1 + rx_mag_dt.WordLength + 2 + 7;
+
+%% CORDIC matrix solve parameters
 
 % N<WordLength
 NumberOfCORDICIterations = matrixdivin_dt.WordLength - 1; 
@@ -127,20 +174,29 @@ NumberOfCORDICIterations = matrixdivin_dt.WordLength - 1;
 % Specify the data-type used in back-substitution
 BackSubstitutePrototype = fi(0, matrixdivbacksub_dt);
 
+% Matrix solver update rate
+% Formulas taken from documentation for "Complex Partial-Systolic Matrix Solve Using QR Decomposition"
+wl = matrixdivin_dt.WordLength;
+n = numArrayElements;
+matrixSolveValidToReady = max((wl + 9), ceil((3.5*n^2 + n*(nextpow2(wl) + wl + 9.5) + 1)/n));
+matrixSolveValidInToOut = (wl + 7.5)*2*n + 3.5*n^2 + n*(nextpow2(wl) + wl + 9.5) + 9 - n;
+matrixSolveThroughput = matrixSolveValidToReady*numArrayElements;
+
 %% Pipeline delays
 
 covMatDelay = 6;
 
-movAvgDelay = 2;%+windowSize/2;
+movAvgDelay = 2;
 
-% Delay due to CORDIC iterations and pipeline registers
-% 10 CORDIC operations in QE decomp, 86 pipeline stages
-matrixDivDelay = NumberOfCORDICIterations*10 + 86;
+matrixSolveDelay = matrixSolveValidToReady*numArrayElements + matrixSolveValidInToOut;
 
-normResponseDelay = 50;
+reciprocalDelay = nextpow2(reciprocalin_dt.WordLength) + 1 + reciprocalin_dt.WordLength + 2 ...
+    - strcmp(reciprocalin_dt.Signedness,'Signed') + 7;
 
-mvdrPipelineDelay = covMatDelay+movAvgDelay+matrixDivDelay+normResponseDelay;
+normResponseDelay = 15+reciprocalDelay;
+
+mvdrPipelineDelay = covMatDelay+movAvgDelay+matrixSolveDelay+normResponseDelay;
 
 %% Simulation parameters
 frameTime = windowSize*Ts;
-stoptime = frameTime*40;
+stoptime = frameTime*20;

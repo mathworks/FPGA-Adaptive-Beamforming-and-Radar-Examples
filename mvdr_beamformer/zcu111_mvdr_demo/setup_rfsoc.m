@@ -16,7 +16,7 @@ ADCSamplingRate = 1966.08; % MHz
 DACSamplingRate = 1966.08; % MHz 
 DecimationFactor = 8;
 InterpolationFactor = 8;
-DDC_DUC_LO = ADCSamplingRate/4; % MHz - Define LO Frequency (MHz) here
+DDC_DUC_LO = 860.16; % MHz - Define LO Frequency (MHz) here
 FineMixMode = true; 
 
 %% User FPGA-logic settings
@@ -115,5 +115,5 @@ applyConfiguration(rfobj)
 rfobj.enableMTS()
 
 %% Disconnect and clear system object
-release(rfobj)
+%release(rfobj)
 
