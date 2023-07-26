@@ -13,6 +13,7 @@ classdef RFSoCMVDRDemo < handle
         InterfererGain
         InterfererAngle
         SteeringAngle
+        InternalLoopbackEnabled = false;
     end
 
     properties (Access = private)
@@ -27,7 +28,7 @@ classdef RFSoCMVDRDemo < handle
         
         % Parameters imported from workspace
         steeringVector
-        sensorArray
+        beamPattern
         centerFrequency
         ncoInc
         DataSampleRate
@@ -44,6 +45,8 @@ classdef RFSoCMVDRDemo < handle
 
         % FPGA register and DMA interface
         hFPGA
+        rx_capture_start_reg
+        dma_read
 
         % Capture source state 
         captureSource = 0;
@@ -56,6 +59,8 @@ classdef RFSoCMVDRDemo < handle
         SRC_MVDR_OUT = 0;
         SRC_MVDR_IN = 1;
         SRC_ADC = 2;
+
+        AZ_SWEEP = -90:90;
     end
 
     %% Public methods
@@ -88,8 +93,7 @@ classdef RFSoCMVDRDemo < handle
                 case 'phaseshift'
                     weights = obj.steeringVector(obj.centerFrequency,[obj.SteeringAngle; 0]);
             end
-            resp=pattern(obj.sensorArray,obj.centerFrequency,-90:90,0,...
-                'Weights',weights);
+            resp = obj.beamPattern(obj.centerFrequency, obj.AZ_SWEEP, weights);
         end
 
         function  [beamData,qpskData,sampleRate] = getUIData(obj)
@@ -103,12 +107,8 @@ classdef RFSoCMVDRDemo < handle
             % Set capture source
             setCaptureSource(obj,obj.SRC_MVDR_OUT);
 
-            % Trigger a capture
-            writePort(obj.hFPGA, "rx_capture_start", false);
-            writePort(obj.hFPGA, "rx_capture_start", true);
-
-            % Read a frame
-            data = readPort(obj.hFPGA, "s2mm_data");
+            % Capture data
+            data = captureData(obj);
 
             % reshape into individual channels
             data = reshape(data,4,[]);
@@ -136,12 +136,8 @@ classdef RFSoCMVDRDemo < handle
                 setCaptureSource(obj,obj.SRC_MVDR_IN);
             end
 
-             % Trigger a capture
-            writePort(obj.hFPGA, "rx_capture_start", false);
-            writePort(obj.hFPGA, "rx_capture_start", true);
-
             % Read a frame
-            data = readPort(obj.hFPGA, "s2mm_data");
+            data = captureData(obj);
 
             % Unpack uint32 to complex int16
             data = unpack_complex(data);
@@ -169,7 +165,6 @@ classdef RFSoCMVDRDemo < handle
             constellation = obj.agc(constellation);
         end
 
-        
     end
     
     %% UI set methods
@@ -236,7 +231,7 @@ classdef RFSoCMVDRDemo < handle
             obj.setSignalGain(-6);
             obj.setSignalAngle(-45);
             obj.setInterfererGain(0);
-            obj.setInterfererAngle(17);
+            obj.setInterfererAngle(35);
             obj.setSteeringAngle(-45);
             
             % Run calibration routine to align channels
@@ -249,8 +244,8 @@ classdef RFSoCMVDRDemo < handle
             obj.DataSampleRate = evalin('base','DataSampleRate');
             obj.centerFrequency = evalin('base','fc');
             obj.FrameSize = evalin('base','s2mmFrameSize');
-            obj.sensorArray = evalin('base','sensorArray');
             obj.steeringVector = evalin('base','steeringVector');
+            obj.beamPattern = evalin('base','beamPattern');
             obj.ncoInc = evalin('base','NCO_default_inc');
             obj.QPSKFrameLength = evalin('base','testSrc1.FrameLength');
             obj.QPSKSamplesPerSymbol = evalin('base','testSrc1.SamplesPerSymbol');
@@ -264,7 +259,7 @@ classdef RFSoCMVDRDemo < handle
         
         function initializeRegisters(obj)
             writePort(obj.hFPGA, "IP_Reset", true);
-            writePort(obj.hFPGA, "internal_loopback", false);
+            writePort(obj.hFPGA, "internal_loopback", obj.InternalLoopbackEnabled);
             writePort(obj.hFPGA, "rx_capture_length", obj.FrameSize);
         end
         
@@ -310,15 +305,36 @@ classdef RFSoCMVDRDemo < handle
                 writePort(obj.hFPGA, "rx_capture_src", val);
             end
         end
+
+        function data = captureData(obj)
+            obj.rx_capture_start_reg(uint32(0));
+            obj.rx_capture_start_reg(uint32(1));
+            data = obj.dma_read();
+        end
         
         function setupFPGAIO(obj)
             if isempty(obj.IPAddress)
-                obj.hFPGA = fpga('Xilinx');
-            else
-                hw = xilinxsoc(obj.IPAddress,'root','root');
-                obj.hFPGA = fpga(hw);
+                hBoardParams = codertarget.hdlcxilinx.internal.BoardParameters;
+                obj.IPAddress = hBoardParams.getIPAddress;
             end
+
+            % Initialize FPGA connection object
+            hw = xilinxsoc(obj.IPAddress,'root','root');
+            obj.hFPGA = fpga(hw);
+
+            % Setup interface mapping
             setup_fpgaio(obj.hFPGA,obj.DMAReadFrameSize);
+
+            % Use LibIIO objects for data capture directly to optimize performance
+            obj.rx_capture_start_reg = matlabshared.libiio.aximm.write( ...
+                uri=['ip:' obj.IPAddress], AddressOffset=0x134);
+            setup(obj.rx_capture_start_reg,uint32(0));
+            obj.dma_read = matlabshared.libiio.axistream.read( ...
+                uri=['ip:' obj.IPAddress],...
+                SamplesPerFrame=obj.DMAReadFrameSize, ...
+                dataTypeStr='int32', ...
+                DataTimeout=0);
+            setup(obj.dma_read);
         end
         
     end

@@ -89,6 +89,13 @@ windowSize = 4096;
 % Diagonal loading value
 diagLoading = 5e-3;
 
+% Use internal directivity object for pattern calculation
+elemPosition = sensorArray.getElementPosition();
+angstep = phased.internal.getPatternIntegrationStepSize(elemPosition,lambda);
+beamPattern = phased.internal.Directivity('Sensor',sensorArray,...
+    'PropagationSpeed',propSpeed,'WeightsInputPort',true,...
+    'AzimuthAngleStepSize',angstep,'ElevationAngleStepSize',angstep);
+
 %% Calibration Tx NCO parameters
 
 NCO_bits = 14;
